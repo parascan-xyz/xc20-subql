@@ -1,0 +1,11 @@
+type Event @entity {
+  id: ID!
+  index: Int!
+  blockNumber: Int!
+  extrinsicIndex: Int
+  section: String
+  method: String
+  data: String
+  hash: String
+  meta: String
+}

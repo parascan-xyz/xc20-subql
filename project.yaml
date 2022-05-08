@@ -1,0 +1,29 @@
+specVersion: 1.0.0
+name: subquery-starter
+version: 0.0.4
+runner:
+  node:
+    name: '@subql/node'
+    version: ^0.33.0
+  query:
+    name: '@subql/query'
+    version: 0.24.0
+description: Tracker of xtoken deposit and withdrawals
+repository: 'https://github.com/subquery/subql-starter'
+schema:
+  file: ./schema.graphql
+network:
+  chainId: '0xfe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d'
+  endpoint: 'wss://moonbeam.api.onfinality.io/public-ws'
+  dictionary: 'https://api.subquery.network/sq/subquery/moonbeam-dictionary'
+dataSources:
+  - kind: substrate/Runtime
+    startBlock: 1
+    mapping:
+      file: ./dist/index.js
+      handlers:
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: xTokens
+            method: TransferredMultiAssets

@@ -8,14 +8,14 @@ import { Int } from "@polkadot/types-codec";
 async function ensureXToken(recordId: string): Promise<XToken> {
   let entity = await XToken.get(recordId);
   if (!entity) {
-    const meta = await api.query.assets.metadata(BigInt(recordId))
+    const meta = (await api.query.assets.metadata(BigInt(recordId))).toHuman()
     // this is another interesting data that might want to be added in the future
     // const asset = await api.query.assets.asset(BigInt(recordId))
     entity = XToken.create({
       id: recordId,
       name: meta.name.toString(),
       symbol: meta.symbol.toString(),
-      decimals: meta.decimals.toNumber(),
+      decimals: Number(meta.decimals.toString()),
     });
     await entity.save();
   }

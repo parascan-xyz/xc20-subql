@@ -1,11 +1,45 @@
-type Event @entity {
+type XToken @entity {
   id: ID!
-  index: Int!
-  blockNumber: Int!
-  extrinsicIndex: Int
-  section: String
-  method: String
-  data: String
-  hash: String
-  meta: String
+  type: String
+  name: String
+  symbol: String
+  decimals: Int
+  balances: [Balance] @derivedFrom(field: "token")
 }
+
+type Account @entity {
+  id: ID!
+  balances: [Balance] @derivedFrom(field: "account")
+}
+
+type Transfer @entity {
+  id: ID!
+  blockNumber: Int
+  from: Account
+  to: Account
+  token: XToken
+  value: BigInt
+}
+
+type Balance @entity {
+  id: ID!
+  account: Account
+  token: XToken
+  value: BigInt
+}
+
+type Network @entity {
+  id: ID!
+}
+
+# type Event @entity {
+#   id: ID!
+#   index: Int!
+#   blockNumber: Int!
+#   extrinsicIndex: Int
+#   section: String
+#   method: String
+#   data: String
+#   hash: String
+#   meta: String
+# }

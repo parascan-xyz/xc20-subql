@@ -1,42 +1,62 @@
 import {SubstrateExtrinsic,SubstrateEvent,SubstrateBlock} from "@subql/types";
-import {Event} from "../types";
+import {Account, Transfer, XToken} from "../types";
 import {Balance} from "@polkadot/types/interfaces";
+import {Codec, AnyJson} from "@polkadot/types-codec/types"
+import { typesBundlePre900 } from "moonbeam-types-bundle"
+import { Int } from "@polkadot/types-codec";
 
-
-
-export async function handleEvent(event: SubstrateEvent): Promise<void> {
-    const blockNumber = event.block.block.header.number.toNumber()
-    const index = Number(event.event.index)
-    const record = Event.create({
-        id: `${blockNumber}-${index}`,
-        index: index,
-        blockNumber: blockNumber,
-        extrinsicIndex: event.extrinsic.idx,
-        section: event.event.section,
-        method: event.event.method,
-        data: event.event.data.toString(),
-        hash: event.event.hash.toString(),
-        meta: event.event.meta.toString()
-    })
-    await record.save();
+async function ensureXToken(recordId: string): Promise<XToken> {
+  let entity = await XToken.get(recordId);
+  if (!entity) {
+    const meta = await api.query.assets.metadata(BigInt(recordId))
+    // this is another interesting data that might want to be added in the future
+    // const asset = await api.query.assets.asset(BigInt(recordId))
+    entity = XToken.create({
+      id: recordId,
+      name: meta.name.toString(),
+      symbol: meta.symbol.toString(),
+      decimals: meta.decimals.toNumber(),
+    });
+    await entity.save();
+  }
+  return entity;
 }
 
+async function ensureAccount(recordId: string): Promise<Account> {
+  recordId = recordId.toLowerCase();
+  let entity = await Account.get(recordId);
+  if (!entity) {
+    entity = new Account(recordId);
+    await entity.save();
+  }
+  return entity;
+}
 
-// export async function handleBlock(block: SubstrateBlock): Promise<void> {
-//     //Create a new starterEntity with ID using block hash
-//     let record = new StarterEntity(block.block.header.hash.toString());
-//     //Record block number
-//     record.field1 = block.block.header.number.toNumber();
-//     await record.save();
-// }
+export async function handleEvent(event: SubstrateEvent): Promise<void> {
+  if (event.block.specVersion == 1401) {
+    // eval string from toString() is used because toArray, toHuman and toJSON method are not working right
+    const eventData = eval(event.event.data.toString())
+    const blockNumber = event.block.block.header.number.toNumber()
+    const index = event.idx
+    const [accountId, multiAssets, multiAsset, multiLocation] = eventData
+    const {id: {concrete: xcm}, fun: {fungible: amount}} = multiAsset as {id: {concrete: string}; fun: {fungible: bigint}}
+    //const {} = multiLocation
+    const tokenId = (await api.query.assetManager.assetTypeId({xcm: xcm})).toString()
+    const token = await ensureXToken(tokenId)
+    const account = await ensureAccount(accountId)
+    const transfer = Transfer.create({
+      id: `${blockNumber}-${index}`,
+      blockNumber: blockNumber,
+      fromId: null,
+      toId: account.id,
+      tokenId: token.id,
+      value: amount
+    })
+    await transfer.save();
+  }
+}
 
-// export async function handleCall(extrinsic: SubstrateExtrinsic): Promise<void> {
-//     const record = await StarterEntity.get(extrinsic.block.block.header.hash.toString());
-//     //Date type timestamp
-//     record.field4 = extrinsic.block.timestamp;
-//     //Boolean tyep
-//     record.field5 = true;
-//     await record.save();
-// }
-
+export async function handleSpecVersion(event: SubstrateEvent): Promise<void> {
+  
+}
 

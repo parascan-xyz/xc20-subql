@@ -22,13 +22,18 @@ dataSources:
     mapping:
       file: ./dist/index.js
       handlers:
-        - handler: handleEvent
+        - handler: handleMint
           kind: substrate/EventHandler
           filter:
-            module: xTokens
+            module: assets
+            method: Issued
+        - handler: handleTransfer
+          kind: substrate/EventHandler
+          filter:
+            module: assets
             method: Transferred
-        - handler: handleEvent
+        - handler: handleBurn
           kind: substrate/EventHandler
           filter:
-            module: xTokens
-            method: TransferredWithFee
+            module: assets
+            method: Burned

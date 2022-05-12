@@ -15,10 +15,13 @@ type Account @entity {
 type Transfer @entity {
   id: ID!
   blockNumber: Int
+  extrinsicIndex: Int
+  eventIndex: Int
   from: Account
   to: Account
   token: XToken
   value: BigInt
+  multiLocation: String
 }
 
 type Balance @entity {

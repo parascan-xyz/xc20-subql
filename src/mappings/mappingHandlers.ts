@@ -32,7 +32,7 @@ async function ensureAccount(recordId: string): Promise<Account> {
   return entity;
 }
 
-export async function handleEvent(event: SubstrateEvent): Promise<void> {
+export async function handleDeposit(event: SubstrateEvent): Promise<void> {
   if (event.block.specVersion == 1401) {
     // eval string from toString() is used because toArray, toHuman and toJSON method are not working right
     const eventData = eval(event.event.data.toString())
@@ -40,14 +40,15 @@ export async function handleEvent(event: SubstrateEvent): Promise<void> {
     const index = event.idx
     const [accountId, multiAssets, multiAsset, multiLocation] = eventData
     const {id: {concrete: xcm}, fun: {fungible: amount}} = multiAsset as {id: {concrete: string}; fun: {fungible: bigint}}
-    //const {} = multiLocation
     const tokenId = (await api.query.assetManager.assetTypeId({xcm: xcm})).toString()
     const token = await ensureXToken(tokenId)
     const account = await ensureAccount(accountId)
     const transfer = Transfer.create({
       id: `${blockNumber}-${index}`,
       blockNumber: blockNumber,
-      fromId: null,
+      extrinsicIndex: event.extrinsic?.idx,
+      eventIndex: index,
+      multiLocation: String(multiLocation),
       toId: account.id,
       tokenId: token.id,
       value: amount
@@ -56,7 +57,13 @@ export async function handleEvent(event: SubstrateEvent): Promise<void> {
   }
 }
 
-export async function handleSpecVersion(event: SubstrateEvent): Promise<void> {
-  
+export async function handleXToken(event: SubstrateEvent): Promise<void> {
+  // handleSpecVersion
+  if (event.block.specVersion >= 1401) {
+    
+  }
 }
 
+export async function handleTransfer(event: SubstrateEvent): Promise<void> {
+  // handleSpecVersion
+}

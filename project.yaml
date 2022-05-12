@@ -26,3 +26,9 @@ dataSources:
           kind: substrate/EventHandler
           filter:
             module: xTokens
+            method: Transferred
+        - handler: handleEvent
+          kind: substrate/EventHandler
+          filter:
+            module: xTokens
+            method: TransferredWithFee

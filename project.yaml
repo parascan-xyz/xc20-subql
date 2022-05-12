@@ -26,4 +26,3 @@ dataSources:
           kind: substrate/EventHandler
           filter:
             module: xTokens
-            method: TransferredMultiAssets

@@ -1,7 +1,7 @@
 {
-  "name": "xtoken",
+  "name": "xc20-subql",
   "version": "1.0.0",
-  "description": "Tracker of xtoken deposit and withdrawals",
+  "description": "Indexing of xc20 deposits, withdrawals and transfers",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",

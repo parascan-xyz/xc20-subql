@@ -1,5 +1,5 @@
 specVersion: 1.0.0
-name: subquery-starter
+name: xc20-subql
 version: 0.0.4
 runner:
   node:
@@ -8,22 +8,32 @@ runner:
   query:
     name: '@subql/query'
     version: 0.24.0
-description: Tracker of xtoken deposit and withdrawals
-repository: 'https://github.com/subquery/subql-starter'
+description: Indexing of xc20 deposits, withdrawals and transfers
+repository: 'https://github.com/parascan-xyz/xc20-subql'
 schema:
   file: ./schema.graphql
 network:
-  chainId: '0xfe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d'
-  endpoint: 'wss://moonbeam.api.onfinality.io/public-ws'
-  dictionary: 'https://api.subquery.network/sq/subquery/moonbeam-dictionary'
+  chainId: '0x401a1f9dca3da46f5c4091016c8a2f26dcea05865116b286f60f668207d1474b'
+  endpoint: 'wss://moonriver.api.onfinality.io/public-ws'
+  dictionary: 'https://api.subquery.network/sq/subquery/moonriver-dictionary'
 dataSources:
   - kind: substrate/Runtime
     startBlock: 1
     mapping:
       file: ./dist/index.js
       handlers:
-        - handler: handleEvent
+        - handler: handleMint
           kind: substrate/EventHandler
           filter:
-            module: xTokens
-            method: TransferredMultiAssets
+            module: assets
+            method: Issued
+        - handler: handleBurn
+          kind: substrate/EventHandler
+          filter:
+            module: assets
+            method: Burned
+        - handler: handleTransfer
+          kind: substrate/EventHandler
+          filter:
+            module: assets
+            method: Transferred

@@ -46,6 +46,7 @@ async function updateBalance(token: string, account: string, value: bigint): Pro
   entity.transferValue += value
   const apiResult:any = (await api.query.assets.account(token, account)).toJSON()
   entity.apiValue = BigInt(apiResult ? apiResult.balance : 0)
+  await entity.save()
 }
 
 async function initFunction(): Promise<void> {

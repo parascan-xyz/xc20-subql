@@ -11,6 +11,7 @@ async function ensureXToken(recordId: string): Promise<XToken> {
     const meta = (await api.query.assets.metadata(BigInt(recordId))).toHuman()
     entity = XToken.create({
       id: recordId,
+      address: "0x" + "f".repeat(42 - recordId.length) + recordId.slice(2),
       name: meta.name.toString(),
       symbol: meta.symbol.toString(),
       decimals: Number(meta.decimals.toString()),
@@ -69,6 +70,7 @@ export async function handleMint(event: SubstrateEvent): Promise<void> {
     blockNumber: blockNumber,
     extrinsicIndex: event.extrinsic?.idx,
     eventIndex: index,
+    timestamp: event.block.timestamp,
     fromId: NULL_ADDRESS,
     toId: to.id,
     tokenId: token.id,
@@ -90,6 +92,7 @@ export async function handleBurn(event: SubstrateEvent): Promise<void> {
     blockNumber: blockNumber,
     extrinsicIndex: event.extrinsic?.idx,
     eventIndex: index,
+    timestamp: event.block.timestamp,
     fromId: from.id,
     toId: NULL_ADDRESS,
     tokenId: token.id,
@@ -112,6 +115,7 @@ export async function handleTransfer(event: SubstrateEvent): Promise<void> {
     blockNumber: blockNumber,
     extrinsicIndex: event.extrinsic?.idx,
     eventIndex: index,
+    timestamp: event.block.timestamp,
     fromId: from.id,
     toId: to.id,
     tokenId: token.id,

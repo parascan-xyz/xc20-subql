@@ -1,5 +1,6 @@
 type XToken @entity {
   id: ID!
+  address: String! @index(unique: true)
   name: String!
   symbol: String!
   decimals: Int!
@@ -16,6 +17,7 @@ type Transfer @entity {
   blockNumber: Int!
   extrinsicIndex: Int
   eventIndex: Int!
+  timestamp: Date!
   from: Account!
   to: Account!
   token: XToken!

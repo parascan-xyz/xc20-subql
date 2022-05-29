@@ -61,7 +61,7 @@ export async function handleMint(event: SubstrateEvent): Promise<void> {
   const blockNumber = event.block.block.header.number.toNumber()
 
   // There should be a better to initialize
-  if (blockNumber == 1295444) {
+  if (blockNumber == 955585) {
     await initFunction()
   }
   
